@@ -1,0 +1,163 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<nav class="navbar navbar-light bg-light" style="background-color: #e3f2fd !important;">
+  <a class="navbar-brand" href="#">
+    <img src="assets/img/ec-tuwien.png" style="width: 13%" alt="image">
+    Offloading-Client
+  </a>
+</nav>
+
+<br/>
+
+<h5 style="margin-left: 1em">Please configure your simulation or load a real example!</h5>
+
+<div style="margin: 2em">
+  <div class="row">
+  <div class="col-md2" style="margin-right: 1em">
+      Load Example:
+      <p-listbox multiple="false" [options]="examples" (onClick)="setExample()" [(ngModel)]="example"></p-listbox>
+      <p-button style="margin-top: 1em; margin-bottom: 1em" label="Load" (onClick)="handleLoadExample($event)"></p-button>
+  </div>
+   <div class="col-md2" style="margin-right: 1em">
+    Available Edge Nodes:
+
+    <p-listbox [listStyle]="{'max-height':'200px'}" multiple="false" [options]="edgeNodes" (onClick)="findMobileDevices()" [(ngModel)]="selectedEdgeNodes"></p-listbox>
+    <p-button style="margin-top: 1em; margin-bottom: 1em" label="Add EdgeNode" (onClick)="handleAddEdgeNode($event)"></p-button>
+
+  </div>
+  <div class="col-md2" style="margin-right: 1em">
+    Available Mobile Devices:
+
+    <p-listbox [listStyle]="{'max-height':'200px'}" multiple="true" [options]="mobileDevices" [(ngModel)]="selectedMobileDevices"></p-listbox>
+    <p-button style="margin-top: 1em; margin-bottom: 1em" label="Add MobileDevice" (onClick)="handleClickMD($event)"></p-button>
+  </div>
+  <div class="col-md2" style="margin-right: 1em">
+      Select your workload trace strategy:<br/>
+          <p-radioButton name="groupname" value="STATIC" [(ngModel)]="selectedSimulationMethod"></p-radioButton> Static<br/>
+          <p-radioButton name="groupname" value="PERIODIC" [(ngModel)]="selectedSimulationMethod"></p-radioButton> Periodic (every 2 time units)<br/>
+          <p-radioButton name="groupname" value="UNPREDICTABLE" [(ngModel)]="selectedSimulationMethod"></p-radioButton> Unpredictiable<br/>
+        </div>
+        <div class="col-md2" style="margin-right: 1em">
+            How computation intense is your application (offloading workload)?<br/>
+                <p-radioButton name="groupname2" value="LOW" [(ngModel)]="selectedComputationMethod"></p-radioButton> Low (e.g., GPS application)<br/>
+                <p-radioButton name="groupname2" value="MEDIUM" [(ngModel)]="selectedComputationMethod"></p-radioButton> Medium (e.g., Facerecognizer)<br/>
+                <p-radioButton name="groupname2" value="HIGH" [(ngModel)]="selectedComputationMethod"></p-radioButton> High (e.g., Chess)<br/>
+              </div>
+  </div>
+  <div class="row">
+    <div class="col-md3" style="margin-right: 1em">
+      Assosiated Mobile Devices
+
+      <p-listbox [listStyle]="{'max-height':'200px'}" multiple="true" [options]="mobileDevicesAss" [(ngModel)]="selectedMobileDevicesAss"></p-listbox>
+      <p-button style="margin-top: 1em; margin-bottom: 1em" label="Add Selected MobileDevice" (onClick)="handleAddSelectedMobileDevice($event)"></p-button>
+
+      <p-button (click)="clear()" styleClass="ui-button-success" style="margin-left: 1em" label="Clear" ></p-button>
+    </div>
+  </div>
+  <br/>
+  <br/>
+  <div class="row">
+    <div class="col-md3">
+        <span class="ui-float-label">
+            <input id="id-input" [(ngModel)]="consideredTimeUnits" [disabled]="false" type="text" size="30" pInputText pTooltip="How many time units should be used for the prediction?" tooltipPosition="top">
+            <label for="id-input">Considered Time Units</label>
+        </span>
+    </div>
+    <div  class="col-md3">
+        <span class="ui-float-label">
+            <input id="id-input" [(ngModel)]="requiredRuns" [disabled]="false" type="text" size="30" pInputText pTooltip="How many simulations (runs) should be performed?" tooltipPosition="top">
+            <label for="id-input">Required Runs</label>
+        </span>
+    </div>
+  </div>
+  <br/><br/>
+  <div class="row">
+    <div class="col-md12" style="text-align: center">
+        <p-button (click)="startSimulation()" styleClass="ui-button-success" label="Start Simulation" ></p-button>
+    </div>
+  </div>
+  <br/>
+  <br/>
+  <div class="row">
+
+
+
+      <div class="col-md12">
+          <p-blockUI [target]="pnl" [blocked]="blockedPanel">
+              <p-progressSpinner></p-progressSpinner>
+          </p-blockUI>
+          <p-table #pnl [value]="edgeNodesResult">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Predicted Offloading Units</th>
+                    <th>Uppaal Query</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-edgeNode>
+                <tr>
+                    <td>{{edgeNode.id}}</td>
+                    <td>{{edgeNode.name}}</td>
+                    <td>{{edgeNode.message.substr(0, edgeNode.message.indexOf("±")) | number:'1.0-0'}}</td>
+                    <td>{{edgeNode.query}}</td>
+                </tr>
+            </ng-template>
+          </p-table>
+        </div>
+
+    <!--
+    <div class="col-md12" style="text-align: left; white-space: pre-line;">
+        {{result}}
+        <br/>
+        <br/>
+    </div>
+    -->
+   
+  </div>
+</div>
+
+<p-confirmDialog header="Fehler" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+<p-dialog header="Add New Edge Device" [(visible)]="displayE">
+  <br/>
+  <br/>
+  <span class="ui-float-label">
+    <input id="id-input" [(ngModel)]="edgeId" [disabled]="true" type="text" size="30" pInputText>
+    <label for="id-input">Id</label>
+</span>
+<br/><br/>
+<span class="ui-float-label">
+  <input id="id-name" [(ngModel)]="edgeName" type="text" size="30" pInputText>
+  <label for="id-name">Name</label>
+</span>
+<p-button style="margin-top: 1em; margin-bottom: 1em" label="Add New EdgeDevice" (onClick)="addNewEdgeDevice($event)"></p-button>
+
+</p-dialog>
+<p-dialog header="Add New Mobile Device" [(visible)]="displayMD">
+    <br/>
+    <br/>
+    <span class="ui-float-label">
+      <input id="id-input" [(ngModel)]="mobileDeviceId" [disabled]="true" type="text" size="30" pInputText>
+      <label for="id-input">Id</label>
+  </span>
+  <br/><br/>
+  <span class="ui-float-label">
+    <input id="id-name" [(ngModel)]="mobileDeviceName" type="text" size="30" pInputText>
+    <label for="id-name">Name</label>
+  </span>
+  <p-button style="margin-top: 1em; margin-bottom: 1em" label="Add New MobileDevice" (onClick)="addNewMobileDevice($event)"></p-button>
+
+
+</p-dialog>
+<!--
+<ul>
+  <li>
+    <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
+  </li>
+  <li>
+    <h2><a target="_blank" rel="noopener" href="https://angular.io/cli">CLI Documentation</a></h2>
+  </li>
+  <li>
+    <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
+  </li>
+</ul>
+-->
